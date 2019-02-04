@@ -107,7 +107,7 @@ TIME = {
 
 
 def abbreviation_prefix(name):
-  for full,abbr in ABBREVIATION_PREFIX:
+  for full,abbr in ABBREVIATION_PREFIX.items():
     i = name.find(full)
     i = i if i>=0 else name.lower().find(full)
     if i>=0:
@@ -151,7 +151,10 @@ def unit_convert(value, source, target):
 
 class Unit(unit_pb2_grpc.UnitServicer):
   def Convert(self, request, context):
-    error,value = unit_convert(request.value, request.souce, request.target)
+    value,source,target = (request.value,request.source,request.target)
+    print("value: "+str(value)+", source: "+source+", target: "+target)
+    error,value = unit_convert(value, source, target)
+    print("error: "+error+", value: "+str(value)+"\n")
     return unit_pb2.ConvertReply(error=error, value=value)
 
 
