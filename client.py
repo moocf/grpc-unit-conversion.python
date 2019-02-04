@@ -7,7 +7,7 @@ import optparse
 
 parser = optparse.OptionParser()
 parser.set_defaults(server="localhost:50051")
-parser.add_option("--server", dest="server", help="Set server address")
+parser.add_option("--server", dest="server", help="set server address")
 parser.usage = "python client.py <value> <source unit> <target unit> [--server <address>]"
 (options, args) = parser.parse_args()
 

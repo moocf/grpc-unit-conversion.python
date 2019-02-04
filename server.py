@@ -3,6 +3,8 @@ import time
 import grpc
 import unit_pb2
 import unit_pb2_grpc
+import sys
+import optparse
 
 
 ABBREVIATION_PREFIX = {
@@ -152,16 +154,24 @@ def unit_convert(value, source, target):
 class Unit(unit_pb2_grpc.UnitServicer):
   def Convert(self, request, context):
     value,source,target = (request.value,request.source,request.target)
-    print("value: "+str(value)+", source: "+source+", target: "+target)
+    print("\nvalue: "+str(value)+", source: "+source+", target: "+target)
     error,value = unit_convert(value, source, target)
-    print("error: "+error+", value: "+str(value)+"\n")
+    print("error: "+error+", value: "+str(value))
     return unit_pb2.ConvertReply(error=error, value=value)
 
 
+parser = optparse.OptionParser()
+parser.set_defaults(address="[::]:50051")
+parser.add_option("--address", dest="address", help="set server address")
+parser.usage = "python server.py [--address <address>]"
+(options, args) = parser.parse_args()
+
+address = options.address
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 unit_pb2_grpc.add_UnitServicer_to_server(Unit(), server)
-server.add_insecure_port('[::]:50051')
+server.add_insecure_port(address)
 server.start()
+print("Server started on "+address)
 try:
     while True:
         time.sleep(1000)
